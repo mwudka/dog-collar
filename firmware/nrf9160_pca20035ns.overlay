@@ -1,0 +1,15 @@
+/ {
+	chosen {
+		zephyr,bt-uart=&uart1;
+	};
+};
+
+&uart1 {
+	current-speed = <1000000>;
+	status = "okay";
+};
+
+&uart0 {
+    rts-pin = <0xFFFFFFFF>;
+	cts-pin = <0xFFFFFFFF>;
+};
