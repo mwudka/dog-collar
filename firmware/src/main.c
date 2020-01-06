@@ -5,37 +5,41 @@
 #include <bluetooth/services/bas.h>
 #include "ble.h"
 
+#include <logging/log.h>
+LOG_MODULE_REGISTER(dog);
+
+
 static struct modem_param_info modem_param;
 
 void main(void)
 {
 
-    printk("Application started\n");
+    LOG_INF("Application started");
 
 	ble_init();
 
-    printk("Connecting to LTE...");
+    LOG_INF("Connecting to LTE...");
     int err = lte_lc_init_and_connect();
 	__ASSERT(err == 0, "LTE link could not be established.");
-    printk("done\n");
+    LOG_INF("Connected to LTE");
 
-    printk("Initializing modem info...");
+    LOG_INF("Initializing modem info...");
     err = modem_info_init();
     __ASSERT(err == 0, "Modem info could not be inited.");
-    printk("done\n");
+    LOG_INF("Modem info inited");
 
     modem_info_params_init(&modem_param);
     
     while (true) {
-        printk("Main app loop\n");
+        LOG_INF("Main app loop");
 
 
 
         int ret = modem_info_params_get(&modem_param);
         if (ret < 0) {
-		    printk("Unable to obtain modem parameters: %d\n", ret);
+		    LOG_WRN("Unable to obtain modem parameters: %d", ret);
         } else {
-            printk("Battery voltage: %u\n", modem_param.device.battery.value);
+            LOG_INF("Battery voltage: %u", modem_param.device.battery.value);
             // TODO: Does the battery really go up to 4.4V?
             uint16_t battery_percent = 100 * modem_param.device.battery.value / 4406;
             if (battery_percent > 100) {
