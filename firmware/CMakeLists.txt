@@ -20,4 +20,8 @@ target_sources(app PRIVATE src/main.c)
 # NORDIC SDK APP END
 zephyr_include_directories(src)
 
-target_sources(app PRIVATE src/ble.c)
+target_sources(app PRIVATE 
+  src/ble.c
+  src/gps.c
+  src/battery_monitor.c
+)
