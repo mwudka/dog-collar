@@ -8,6 +8,7 @@
 #include "ble.h"
 #include "gps.h"
 #include "battery_monitor.h"
+#include "activity_tracker.h"
 
 #include <logging/log.h>
 LOG_MODULE_REGISTER(dog);
@@ -129,11 +130,14 @@ void main(void)
     LOG_INF("Initializing GPS...");
     gps_control_init(gps_trigger_handler);
     LOG_INF("GPS inited");
-    
-    k_delayed_work_init(&gps_start_work, gps_start_handler);
-    k_delayed_work_init(&gps_stop_work, gps_stop_handler);
 
-    k_delayed_work_submit(&gps_start_work, K_SECONDS(10));
+    LOG_INF("Initializing activity tracker...");
+    err = init_activity_tracker();
+    if (err) {
+        LOG_WRN("Error initing activity tracker: %d", err);
+    } else {
+        LOG_INF("Activity tracker ready");
+    }
     
     while (true) {
         LOG_INF("Main app loop");

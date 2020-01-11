@@ -24,4 +24,5 @@ target_sources(app PRIVATE
   src/ble.c
   src/gps.c
   src/battery_monitor.c
+  src/activity_tracker.c
 )
