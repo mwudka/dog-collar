@@ -25,4 +25,5 @@ target_sources(app PRIVATE
   src/gps.c
   src/battery_monitor.c
   src/activity_tracker.c
+  src/vendor/croaring/roaring.c
 )
