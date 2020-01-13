@@ -27,6 +27,7 @@ int battery_monitor_init(void)
 {
 	int ret;
 
+	LOG_INF("Initializing ADP536X");
 	ret = adp536x_init(ADP536X_I2C_DEV_NAME);
 	if (ret) {
         LOG_WRN("Unable to init ADP536X driver: %d", ret);
