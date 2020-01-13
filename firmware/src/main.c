@@ -108,11 +108,15 @@ void main(void)
 {
     LOG_INF("Application started");
 
+    // TODO: Automatically disable when building for qemu
 	ble_init();
 
+    bool battery_monitor_valid = false;
     int err = battery_monitor_init();
     if (err) {
         LOG_WRN("Error initializing bttery monitor: %d", err);
+    } else {
+        battery_monitor_valid = true;
     }
 
     LOG_INF("Connecting to LTE...");
@@ -142,19 +146,21 @@ void main(void)
     while (true) {
         LOG_INF("Main app loop");
 
-        u8_t battery_percent;
-        int ret = battery_monitor_read(&battery_percent);
-        if (ret) {
-            LOG_WRN("Unable to read battery level: %d", ret);
-        } else {
-            LOG_INF("Battery level: %d", battery_percent);
-            if (battery_percent < 0) {
-                battery_percent = 0;
+        if (battery_monitor_valid) {
+            u8_t battery_percent;
+            int ret = battery_monitor_read(&battery_percent);
+            if (ret) {
+                LOG_WRN("Unable to read battery level: %d", ret);
+            } else {
+                LOG_INF("Battery level: %d", battery_percent);
+                if (battery_percent < 0) {
+                    battery_percent = 0;
+                }
+                if (battery_percent > 100) {
+                    battery_percent = 100;
+                }
+                bt_gatt_bas_set_battery_level((uint16_t)battery_percent);
             }
-            if (battery_percent > 100) {
-                battery_percent = 100;
-            }
-            bt_gatt_bas_set_battery_level((uint16_t)battery_percent);
         }
 
         if (!atomic_get(&gps_is_active)) {
@@ -167,6 +173,6 @@ void main(void)
             }
         }
 
-		k_sleep(K_SECONDS(1));
+		k_sleep(K_SECONDS(10));
 	}
 }
