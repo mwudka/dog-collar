@@ -1,0 +1,6 @@
+syntax = "proto2";
+
+message Activity {
+    required uint64 timestamp = 1;
+    required bytes serialized_roaring_bitmap = 2;
+}
