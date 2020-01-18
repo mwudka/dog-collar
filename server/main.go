@@ -1,7 +1,7 @@
 package main
 
 import (
-	"./dogcollar"
+	"server/dogcollar"
 	"bytes"
 	"encoding/binary"
 	"errors"
