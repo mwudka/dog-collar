@@ -1,0 +1,49 @@
+version: 2
+
+jobs:
+    build-server:
+        docker:
+            - image: circleci/golang:1.12
+        steps:
+            - checkout
+            - run:
+                name: Build go binary
+                command: |
+                    cd server
+                    GOOS=linux GOOARCH=x86 go build -o dogcollar-server-linux main.go
+                    GOOS=darwin GOOARCH=x86 go build -o dogcollar-server-osx main.go
+                    mv dogcollar-server-* /tmp
+            - store_artifacts:
+                path: /tmp/dogcollar-server-linux
+            - store_artifacts:
+                path: /tmp/dogcollar-server-osx
+
+    build-firmware:
+        machine: true
+        steps:
+            - restore_cache:
+                keys:
+                  - source-v1-{{ .Branch }}-{{ .Revision }}
+                  - source-v1-{{ .Branch }}-
+                  - source-v1-    
+                  - toolchain  
+            - checkout
+            - save_cache:
+                key: source-v1-{{ .Branch }}-{{ .Revision }}
+                paths:
+                  - ".git"
+            - run: ./ci/build.sh
+            - save_cache:
+                key: toolchain
+                paths:
+                  - "{{ .Environment.HOME }}/toolchain"
+            - store_artifacts:
+                path: "/tmp/build/zephyr/merged.hex"
+
+
+workflows:
+    version: 2
+    workflow:
+        jobs:
+            - build-server
+            - build-firmware
